@@ -1,0 +1,22 @@
+[package]
+name = "lab1"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+description = "A collection of small programming tasks"
+
+# 启用多个二进制目标
+[[bin]]
+name = "task1"
+path = "src/bin/task1.rs"
+
+[[bin]]
+name = "task2"
+path = "src/bin/task2.rs"
+
+[[bin]]
+name = "task3"
+path = "src/bin/task3.rs"   
+
+[dependencies]
+# 在这里添加项目依赖
