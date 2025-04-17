@@ -18,5 +18,29 @@ path = "src/bin/task2.rs"
 name = "task3"
 path = "src/bin/task3.rs"   
 
+[[bin]]
+name = "task4"
+path = "src/bin/task4.rs"
+
+[[bin]]
+name = "task5"
+path = "src/bin/task5.rs"
+
+[[bin]]
+name = "task6"
+path = "src/bin/task6.rs"
+
+[[bin]]
+name = "task7"
+path = "src/bin/task7.rs"
+
+[[bin]]
+name = "task8"
+path = "src/bin/task8.rs"   
+
 [dependencies]
 # 在这里添加项目依赖
+rand = "0.8"
+
+[profile.release]
+panic = "abort"

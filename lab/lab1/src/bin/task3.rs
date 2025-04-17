@@ -1,3 +1,5 @@
+//第 n 行的第 k 个数字为组合数 C_{k-1}^{n-1}。
+
 use lab1::utils;
 
 fn jiecheng(n: i32) -> i32 {
