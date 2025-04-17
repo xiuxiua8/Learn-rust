@@ -9,6 +9,33 @@
 
 use actix_web::{get, App, HttpServer, Responder, HttpResponse};
 use actix_files::Files;
+use serde::{Deserialize, Serialize};
+use std::sync::Mutex;
+use actix_web::web;
+
+#[derive(Serialize, Deserialize, Clone)]
+struct Book {
+    //id: u32,
+    title: String,
+    author: String,
+}
+struct AppState {
+    books: Mutex<Vec<Book>>,
+}
+
+
+// GET /books
+async fn get_books(data: web::Data<AppState>) -> impl Responder {
+    let books = data.books.lock().unwrap();
+    HttpResponse::Ok().json(&*books)
+}
+
+// POST /books
+async fn add_book(book: web::Json<Book>, data: web::Data<AppState>) -> impl Responder {
+    let mut books = data.books.lock().unwrap();
+    books.push(book.into_inner());
+    HttpResponse::Created().body("Book added successfully")
+}
 
 #[get("/hello")]
 async fn hello() -> impl Responder {
@@ -17,9 +44,16 @@ async fn hello() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    let app_state = web::Data::new(AppState {
+        books: Mutex::new(vec![]),
+    });
+
+    HttpServer::new(move || {
         App::new()
+            .app_data(app_state.clone()) // 👈 克隆 Data 的 Arc 指针
             .service(hello)
+            .route("/books", web::get().to(get_books))
+            .route("/books", web::post().to(add_book))
             .service(Files::new("/snake", "/Users/zilong/coding/weblab/catbook-react/").index_file("index.html"))
             .service(Files::new("/", "/Users/zilong/coding/weblab/").index_file("hello.html"))
     })
@@ -27,3 +61,4 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
+
