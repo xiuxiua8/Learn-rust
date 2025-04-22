@@ -12,6 +12,8 @@ use actix_files::Files;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 use actix_web::web;
+use tracing::{info, Level};
+use tracing_subscriber::FmtSubscriber;
 
 #[derive(Serialize, Deserialize, Clone)]
 struct Book {
@@ -44,13 +46,23 @@ async fn hello() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    // 初始化 tracing 日志系统
+    let subscriber = FmtSubscriber::builder()
+        .with_max_level(Level::INFO) // 可选 Level::DEBUG / Level::TRACE
+        .finish();
+
+    tracing::subscriber::set_global_default(subscriber)
+        .expect("setting default subscriber failed");
+
+    // 创建共享的 AppState
     let app_state = web::Data::new(AppState {
         books: Mutex::new(vec![]),
     });
 
     HttpServer::new(move || {
         App::new()
-            .app_data(app_state.clone()) // 👈 克隆 Data 的 Arc 指针
+            .wrap(actix_web::middleware::Logger::default()) // 👈 日志中间件
+            .app_data(app_state.clone())
             .service(hello)
             .route("/books", web::get().to(get_books))
             .route("/books", web::post().to(add_book))
@@ -61,4 +73,3 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
-

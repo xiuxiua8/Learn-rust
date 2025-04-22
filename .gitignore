@@ -3,3 +3,7 @@
 */*/*/target
 Cargo.lock
 .obsidian
+ppt
+*.doc
+*.zip
+world_hello
